@@ -1,0 +1,128 @@
+---
+layout: post
+title: Generating planets with javascript and WebGL
+date: 2012-11-01 13:02:37.000000000 +00:00
+categories: []
+tags: []
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '1'
+  _syntaxhighlighter_encoded: '1'
+---
+<p>I recently stated using three.js to play around with webgl and here are the first fruits - procedurally generating planets with javascript. The demo is avalible <a href="http://hacks.philingrey.com/planet_gen/">here</a>.<br />
+<a href="http://hacks.philingrey.com/planet_gen/"><img src="assets/Screen-Shot-2012-10-30-at-10.24.38.png" alt="" title="Procedurally generated planet" width="495" height="605" class="aligncenter size-full wp-image-251" /></a><br />
+<!--more--></p>
+<h2>Method:</h2>
+<p>I ended up using an oldie-but-goodie method based on <a href="http://freespace.virgin.net/hugo.elias/models/m_landsp.htm">hemisphere perturbation</a>: you choose a random hemisphere and slightly nudge it outwards and nudge the other hemisphere inwards. Do this a lot of times and you have a reasonable looking planet.</p>
+<p>[caption id="attachment_247" align="aligncenter" width="550"]<a href="http://hacks.philingrey.com/wp-content/uploads/2012/11/itt.jpg"><img class="size-large wp-image-247" title="iterations of hemisphere perturbation" src="assets/itt-1024x183.jpg" alt="1, 5, 50 and 500 iterations of perturbation" width="550" height="98" /></a> 1, 5, 50 and 500 iterations of hemisphere perturbations showing the development of coastlines[/caption]</p>
+<p>This method has one drawback - one side is the relief of the other, i.e. if one point is above the water level then the opposite point will be underwater. This can be <a href="http://freespace.virgin.net/hugo.elias/models/m_landsp.htm">fixed</a> but takes more iterations to look authentic.</p>
+<p>All in all, whilst this is certainly not the fastest method, its quick to setup and and easy to understand.</p>
+<h2>Lessons learnt:</h2>
+<p>The main issue is that it can take a while to generate the planet and the browser becomes unresponsive during that time. The solution? Move the code across to a web worker. As a result the main code becomes clearer but debugging becomes more of a pain: for debugging web workers I'd recommend chrome - errors in the web worker still display in the console!</p>
+<h2>Code:</h2>
+<p>The code to generate the planet geometry is in <a href="http://hacks.philingrey.com/planet_gen/world_gen.js">this script</a>. Here I'll go through the main three.js code. Firstly we have the basic three.js set up:</p>
+<p>[code lang="js"]// set the scene size<br />
+var WIDTH = 400,<br />
+  HEIGHT = 400;</p>
+<p>// set some camera attributes<br />
+var VIEW_ANGLE = 45,<br />
+  ASPECT = WIDTH / HEIGHT,<br />
+  NEAR = 0.1,<br />
+  FAR = 10000;</p>
+<p>// create a WebGL renderer, camera<br />
+// and a scene<br />
+var renderer = new THREE.WebGLRenderer();<br />
+var camera =<br />
+  new THREE.PerspectiveCamera(<br />
+    VIEW_ANGLE,<br />
+    ASPECT,<br />
+    NEAR,<br />
+    FAR);</p>
+<p>var scene = new THREE.Scene();</p>
+<p>// add the camera to the scene<br />
+scene.add(camera);</p>
+<p>// the camera starts at 0,0,0<br />
+// so pull it back<br />
+camera.position.z = 200;</p>
+<p>// create a point light<br />
+var pointLight =<br />
+  new THREE.PointLight(0xFFFFFF);</p>
+<p>// set its position<br />
+pointLight.position.x = 10;<br />
+pointLight.position.y = 50;<br />
+pointLight.position.z = 250;</p>
+<p>// add to the scene<br />
+scene.add(pointLight);</p>
+<p>// start the renderer<br />
+renderer.setSize(WIDTH, HEIGHT);</p>
+<p>// attach the render-supplied DOM element<br />
+document.body.appendChild( renderer.domElement );[/code]</p>
+<p>Then set up the textures, the idea is to have a water sphere and a land sphere overlapping so when the land sinks past a certain radius you see the water (i.e. it defines a sea level):</p>
+<p>[code lang="js"]// set up the sphere vars<br />
+var radius = 50,<br />
+    segments = 256,<br />
+    rings = 256;</p>
+<p>// earth<br />
+var landTexture = new THREE.Texture();<br />
+var landloader = new THREE.ImageLoader();</p>
+<p>landloader.addEventListener( 'load', function ( event ) {<br />
+	landTexture.image = event.content;<br />
+	landTexture.needsUpdate = true;<br />
+} );<br />
+landloader.load( './textures/terrain/backgrounddetailed6.jpg' );</p>
+<p>// water<br />
+var waterTexture = new THREE.Texture();<br />
+var waterloader = new THREE.ImageLoader();</p>
+<p>waterloader.addEventListener( 'load', function ( event ) {<br />
+	waterTexture.image = event.content;<br />
+	waterTexture.needsUpdate = true;<br />
+} );<br />
+waterloader.load( './textures/water.jpg' );</p>
+<p>// create a new mesh with<br />
+// sphere geometry<br />
+var geometry;<br />
+var material;<br />
+var sphere;</p>
+<p>material = new THREE.MeshLambertMaterial( { map: landTexture, overdraw: true } );<br />
+material.color.setHex(0xFFFFFF);</p>
+<p>// Water<br />
+var geometryw = new THREE.SphereGeometry( radius, segments, rings );<br />
+var materialw = new THREE.MeshLambertMaterial( { map: waterTexture, overdraw: true } );<br />
+materialw.color.setHex(0x0000FF);<br />
+var spherew = new THREE.Mesh( geometryw, materialw );<br />
+[/code]</p>
+<p>Now all that's left is the land geometry, here's where the web worker comes in:</p>
+<p>[code lang="js"]<br />
+// load up the web worker<br />
+var worker = new Worker('./world_gen.js');</p>
+<p>// define what happens when we get a message</p>
+<p>worker.addEventListener('message', function(e) {<br />
+	if(e.data.msg == &quot;progress&quot;){<br />
+		// update the progress bar<br />
+		document.getElementById('debug').innerHTML = (e.data.perc+'').slice(0,4)+&quot;% complete&quot;;<br />
+	} else if(e.data.msg == &quot;finished&quot;){<br />
+		// If this isn't the first render remove the last one<br />
+		if(sphere) {scene.remove(sphere);}</p>
+<p>		// calculation is finished - update the geometry<br />
+		document.getElementById(&quot;debug&quot;).innerHTML = &quot;&quot;;<br />
+		for(var i=0;i&lt;e.data.verts.length;i++){<br />
+			geometry.vertices[i].x = e.data.verts[i].x;<br />
+			geometry.vertices[i].y = e.data.verts[i].y;<br />
+			geometry.vertices[i].z = e.data.verts[i].z;<br />
+		}</p>
+<p>		sphere = new THREE.Mesh( geometry, material );</p>
+<p>		scene.add(sphere);<br />
+	} else {<br />
+		console.log(e);<br />
+	}</p>
+<p>},false);</p>
+<p>// finally, when the start button is clicked fire a message to the web worker to get started<br />
+document.getElementById(&quot;startb&quot;).addEventListener(&quot;click&quot;,function(e){<br />
+	scene.add(spherew);</p>
+<p>	geometry = new THREE.SphereGeometry( radius, segments, rings );</p>
+<p>	worker.postMessage({&quot;cmd&quot;: &quot;run&quot;, &quot;offcenter&quot;:document.getElementById(&quot;offcentercb&quot;).checked ,&quot;verts&quot;: geometry.vertices, &quot;radius&quot;: radius, &quot;N&quot;: document.getElementById('itttext').value});<br />
+});<br />
+[/code]</p>
+<p>Then all that's left is to add a slow rotation and <a href="http://hacks.philingrey.com/planet_gen/">it's done</a>.</p>

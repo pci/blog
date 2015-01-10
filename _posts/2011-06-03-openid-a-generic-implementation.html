@@ -1,0 +1,32 @@
+---
+layout: post
+title: OpenID - a generic implementation
+date: 2011-06-03 09:16:59.000000000 +01:00
+categories: []
+tags:
+- Javascript
+- Login systems
+- OpenID
+- PHP
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '1'
+  _oembed_a66825979f57a9fafd2eb051f048b5e0: <object width="550" height="438"><param
+    name="movie" value="http://www.youtube.com/v/xcmY8Pk-qEk?version=3"></param><param
+    name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed
+    src="http://www.youtube.com/v/xcmY8Pk-qEk?version=3" type="application/x-shockwave-flash"
+    width="550" height="438" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+  _oembed_20ec31e9de66f86df77f2fe87ace63c6: <iframe width="550" height="413" src="http://www.youtube.com/embed/xcmY8Pk-qEk?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+---
+<p><a title="OpenID.net" href="http://openid.net/" target="_blank">OpenID</a> is a powerful idea: you only need one username and password to access all the different websites you use. For an idea of how it works see this video from <a title="myVidoop.com" href="http://hacks.philingrey.com/wp-admin/myVidoop.com" target="_blank">myvidoop</a> (an OpenID provider):</p>
+<p>http://www.youtube.com/watch?v=xcmY8Pk-qEk</p>
+<p>So from a user point of view it's nice and simple, and with companies like google, yahoo, AOL and others supporting it, many people already have an OpenID without even knowing it. And from a web developer point of view you don't have to worry about making a secure up-to-date login system as the OpenID providers do that for you.</p>
+<p>The challenge for a website then is to make it easy for people who've never encountered OpenID to login. There are some nice graphical systems out there (the most popular being <a href="http://code.google.com/p/openid-selector/" target="_blank">openid-selector</a>), however I prefer <a title="Jarrett Vance's OpenID login" href="http://jvance.com/pages/jQueryOpenIdPlugin.xhtml" target="_blank">this system</a> from Jarrett Vance, it's more lightweight, far more hackable (in the good way),  has a natural and clever non-javascript fall-back and it's easy to plug into any OpenID verification system you like.</p>
+<p>Combining this with the <a href="http://code.google.com/p/lightopenid/" target="_blank">LightOpenID</a> PHP verification system and a bit of PHP sessions, gives the following generic login system:</p>
+<p style="text-align: center;"><a href="http://hacks.philingrey.com/OpenID/"><img class="aligncenter size-full wp-image-72" title="OpenID login" src="assets/snapshot61.png" alt="OpenID login" width="470" height="287" /></a></p>
+<p style="text-align: center;">&nbsp;</p>
+<p>Which you can have a go with <a title="OpenID login system" href="http://hacks.philingrey.com/OpenID/" target="_blank">here</a>.</p>
+<p>And here are all the files (<a title="tar.gz of files" href="http://hacks.philingrey.com/OpenID/OpenID.tar.gz" target="_blank">tar.gz</a> / <a title="Zip of files" href="http://hacks.philingrey.com/OpenID/OpenID.zip" target="_blank">zip</a>)</p>

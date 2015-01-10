@@ -1,0 +1,76 @@
+---
+layout: post
+title: 'DeltaImg: resolution and bandwidth responsive images'
+date: 2012-03-23 10:20:49.000000000 +00:00
+categories:
+- Images
+- Javascript
+tags:
+- image
+- Javascript
+- responsive images
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '1'
+---
+<h3>tl;dr</h3>
+<p>A resolution and bandwidth responsive image system is shown. All img tags start pointing to the low res image versions, then javascript downloads (in the background) difference files to upgrade the low resolution images into a high resolution images, and as such doesn't waste http requests or any data... oh and there are some fun kitten <a title="Responsive Kittens!" href="http://hacks.philingrey.com/deltaimg/test1.html" target="_blank">demos</a> as well. All files can be found at <a title="DeltaImg Source" href="http://github.com/pci/deltaimg" target="_blank">github.com/pci/deltaimg</a>.</p>
+<h1>DeltaImg:</h1>
+<p>Responsive images are one of those current "cutting-edge" web topics - developers would like to do something but the specs don't (yet) allow it.</p>
+<p>The basic idea is this - you want to serve agile small image to your mobile viewer, whilst serving crisp high-quality images to viewers with lots of pixels (think new iPad). Then there's also the bandwidth problem - users with a crummy connection would probably rather get a crummy, but usable, image that have to wait an age to see the whole page.</p>
+<p>This is my attempt at helping with the problem.<!--more--></p>
+<p>Now there have been many attempted solutions, both client- and server-side, by people far cleverer than me (for a good summary see <a title="Responsive Images Video" href="http://vimeo.com/38947881" target="_blank">here</a>), and all of them suffer from drawbacks. Mine is no different, it's just none of the other solutions have this particular set of drawback, so it might be useful in some situations.</p>
+<p>This method is a client-side method, very like the method that would load a page with the mobile images and, if the screen was big enough, would swap out the mobile images and put in high-resolution images.....but if this method exists why don't people use?</p>
+<h2>The problem:</h2>
+<p>The problem with quickly swapping the images is that browsers are clever and fast - the browser loads the page, sees the img tag with the mobile image and quickly runs off to fetch it. Some time later your javascript kicks in and swaps the image. This means the original http request and data that was loaded is totally wasted - bad for your server bandwidth, bad for your user's data contract and bad user experience generally.</p>
+<h2>DeltaImg Method:</h2>
+<p>The deltaImg method came about by asking "what if that first request could be used and not wasted?" or, more precisely, because we know we're going to be replacing the image with <strong>the same image</strong> (just at a better quality) couldn't we download the low quality version fully and display it to the user, then just download a difference file that tells us how to upgrade the low quality image?</p>
+<p>Well since I'm writing this the answer better be yes!</p>
+<p>Here's a demo to explain what I mean (click the image below to launch). When you choose a cat the low quality version is pulled from the server, with the high quality version displayed below it for comparison. When the "upgrade" button is clicked your browser asks the server for the difference between the low and medium quality versions, it then uses a canvas element to stitch the two together and improve the picture. Clicking again asks the server for the medium to high difference image and, again, the image is then upgraded.<br />
+<a href="http://hacks.philingrey.com/deltaimg/test1.html"><img class="aligncenter size-large wp-image-204" title="DeltaImg Demo 1" src="assets/Screen-Shot-2012-03-22-at-18.59.23-1024x658.png" alt="" width="550" height="353" /></a></p>
+<h2>But no-one wants to sit clicking upgrade buttons!</h2>
+<p>Well that was just a demonstration, the web-page would do this automatically in the background - load the low res image then if the screen resolution is high enough request the relevant difference files.</p>
+<p>Below is an another demo. The best way to use this demo is to take out your mobile, <strong>turn off 3G</strong> (and wifi!) and then go to this demo. If things seem to load very quickly clear your cache and try again.<br />
+<a href="http://hacks.philingrey.com/deltaimg/test2.html"><img class="aligncenter  wp-image-206" title="DeltaImg Demo 2" src="assets/screenshot-1332444693442.png" alt="" width="500" height="300" /></a></p>
+<h2>How am I supposed to make these difference files then?</h2>
+<p>I've put together a node.js script to do it automagically, it can be found along with the demo sources at <a title="DeltaImg Source" href="http://github.com/pci/deltaimg" target="_blank">github.com/pci/deltaimg</a></p>
+<h2>You said it's bandwidth responsive as well as resolution responsive?</h2>
+<p>Why yes I did, leading question! Imagine the most pathological case: a new iPad that's connected over 2G (low bandwidth - high resolution). Most responsive systems would go "Hey look a new iPad! Man, you gotta love that dpi: here have the biggest pictures I have available!!!!" which, over 2G, will take approximately 5-10 ice-ages. In comparison DeltaImg would serve the low res image, giving the user an image quickly, then <strong>whilst they're browsing</strong> the difference files are fetched in the background and the images are slowly upgraded, which I'd argue it the best way to deal with this situation.</p>
+<p>So your small screen user will only ever download the low res image, because that's all they need, and the low-bandwidth user gets an image nice and quickly. At the other end of the spectrum your high-end, fast connect, user is going to do three http request quickly one after the other, and this is a draw-back of the system but I think it fits with progressive enhancement to have these guys shoulder the http burden. Plus these are also the most likely group to get a &lt;picture&gt; implementation when(/if) it become w3c spec.</p>
+<h2>Advantages</h2>
+<ul>
+<li>Simple, clean html - in a future version you'll just have to put an img tag linking to the low resolution version and add a "responsive" class to the tag, the javascript will do the rest</li>
+<li>Selective - it doesn't do anything to any img tags unless you tell it to.</li>
+<li>Future friendly - see below for a proposal of making it play nicely with the &lt;picture&gt; proposal</li>
+<li>It doesn't break the web - nothing nefarious is used and it'll pass any validator you throw at it</li>
+<li>No race conditions - there's no chance of it breaking because everything has a nice one-after-another ordering</li>
+<li>No wasted http requests/data - The total filesize for 3 files is roughly the same as full image (better on larger images)</li>
+</ul>
+<h2>Drawbacks</h2>
+<ul>
+<li>Three http requests per image - this is more of a problem for the fast-connection, large-screen user where the http request will come thick and fast. However these are also the users most likely to get the &lt;picture&gt; element, whenever it's finalised</li>
+<li>Double server-side storage of images - yep, and there's no way round it!</li>
+<li>For small images the combined size of the low res image and difference images can be bigger than the full image, incurring a slight data overhead (see below)</li>
+<li>The fully upgraded image isn't necessarily identical to the full image (see below)</li>
+<li>Non-javascript users get the low res image...always</li>
+</ul>
+<h1>Advanced Questions - Warning, here be dragons</h1>
+<h2>The system seems a little on the slow side....</h2>
+<p>Yes, this is just a proof-of-concept, I haven't put any effort into code optimization. I've a theory that the main computation work can be turned into canvas operations (e.g. adding semi-transparent layers to use the difference) in which case many browsers would hardware-accelerate the process making it far more efficient.</p>
+<h2>Is the final image identical to the full image?</h2>
+<p>Not guaranteed. Because of the way the difference files are create (see next two points) the final image will be very close, but not necessarily identical, to the full image. If this is a problem the algorithm can be modified to give better performance in this area.</p>
+<h2>Why are the difference files jpegs, surely there's a better way?</h2>
+<p>My main idea was that the difference file would have a lot of a lot of zeros in the frequency domain, especially for low frequencies, so some form of run length encoding in the frequency domain was going to be best. My first attempt involved doing an FFT of the image in javascript, applying the difference file (at this point a generic binary file) and then applying an IFFT to get the new image. But this was clunky to say the least.</p>
+<p>Then I remembered that jpeg's run-length encode their frequency components as part of the spec. Now while saving as a jpeg adds a lossy compression step the overhead of the FFTs is handled by the browser making it much faster and the javascript much shorter.</p>
+<h2>Why can a difference file only move an RGB channel 127 in any direction?</h2>
+<p>Wow, you have studied the code well!</p>
+<p>To begin with the difference was encoded mod 256, but this causes loop around noise - if a pixel was at 255 and the difference file said to add 1 (rather than 0 because of noise) then the pixel loops around to 0! So the difference file can only give instructions in the rage [-128,+127] and then the resulting pixel is clipped to [0,255] preventing the above problem. Now this isn't the only way to do it and if you have a better way please send a pull request at <a title="DeltaImg Source" href="http://github.com/pci/deltaimg" target="_blank">github.com/pci/deltaimg</a></p>
+<h2>What's the overhead with using this system?</h2>
+<p>With smaller images the three files (low res file, low to med diff file and med to high diff file) can be larger than the full image, so users downloading all three get a slight data overhead. Also users with a fast connection will get three http requests in short succession, but then again they have a good connection so it's probably not the end of the world. Finally there is the CPU overhead of upgrading the images.</p>
+<h2>What about the &lt;picture&gt; proposal?</h2>
+<p>While not in it's current form I'd like to think that a future DeltaImg would defer to &lt;picture&gt; and only pick up if there wasn't support, or the user explicitly requested it. Also the method could be modified to act as a &lt;picture&gt; polyfill itself (but that'll have to wait for another day!)</p>
+<h2>What about old versions of IE that don't support &lt;canvas&gt;, or non-javascript users?</h2>
+<p>Simplest answer: they get the low resolution image.</p>
+<p>More complicated answer: For old IE canvas can be <a title="Canvas Polyfill" href="http://code.google.com/p/explorercanvas/" target="_blank">polyfilled</a>, and then this method should work. Non-javascript users you can't do much about.</p>

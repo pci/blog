@@ -1,0 +1,28 @@
+---
+layout: post
+title: Box2d.js and load times
+date: 2011-06-17 09:12:11.000000000 +01:00
+categories:
+- Javascript
+tags:
+- Box2d.js
+- compression
+- gzip
+- Javascript
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '1'
+---
+<p>I recently discovered <a title="box2d-js" href="http://http://box2d-js.sourceforge.net/" target="_blank">box2djs</a> by Ando Yasushi, a nice little physics simulation engine made to run in javascript, here's an example from the homepage:</p>
+<p><a title="box2d-js Homepage" href="http://box2d-js.sourceforge.net/index2.html" target="_blank"><img class="aligncenter size-full wp-image-85" title="box2djs" src="assets/snapshot7.png" alt="box2d-js homepage" width="498" height="303" /></a></p>
+<p>However, it being a port of a port, there are one or two little problems. The main one by far is the delivery of the library - in the flash version, modules are loaded lazily (i.e. as needed), however in javascript all the different libraries need loading up-front.... all 64 of them... in a set order... and each file has the full MIT license information at the top!</p>
+<p>So the browser has to make 64 different server calls and pull down 349 Kb just to start doing anything. This can clearly be improved on.</p>
+<p>Turning on <a title="Pushing beyond gzipping" href="http://developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/" target="_blank">server-side gzip</a>, is a good way to reduce the amount of data transmitted with no real downsides. Also putting everything in one file will help a lot, but more can still be done.</p>
+<p>To shrink the javascript filesize even more there are two paths: compressors or encoders. Compressors (like yahoo's <a title="YUI Compressor" href="http://developer.yahoo.com/yui/compressor/" target="_blank">YUI compressor</a>) remove whitespace, rename internal variables to have shorter name and do a hundred and one different optimizations, but crucially, the end javascript is programmatically identical to the input file (a browser doesn't care if a variable is called "theGreenBallsRadius" or "aPb"). Encoders (like Dean Edwards' <a title="Packer" href="http://dean.edwards.name/packer/" target="_blank">Packer</a>) go one stage further - they encode the resulting file (much like gzipping) and then tag on some javascript so the browser can decode it at the other end, but this creates some javascript overhead before things can get up and running.</p>
+<p>Now because everything is better in table form:<br />
+<strong>[table id=1 /]</strong></p>
+<p><strong></strong>This shows near 85% improvement just by putting everything in one file and turning on gzip! But even better, the filesize can be halved on top of this.</p>
+<p>My first instinct was to go with the Packer encoded version: it's the smallest (or close enough) whether the user's browser supports gzip or not. But the YUI compressed version is my recommendation. Why? Well I'm glad you asked! The vast majority of visitors' browsers will accept gzipped files, so for them there's no filesize difference between YUI and Packer. Now with YUI you can just un-gzip and you're away, however with Packer you unzip <em>then</em> decode <em>then</em> you're good to go. This additional step will still halt rendering until it's complete, making the page load feel slower - the exact thing we were trying to improve.</p>
+<p>There you go, a good library made better! Now onto hacking it.....</p>

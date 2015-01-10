@@ -1,0 +1,53 @@
+---
+layout: post
+title: Making a web-based CV
+date: 2012-04-10 11:17:38.000000000 +01:00
+categories:
+- CSS
+tags: []
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '1'
+  _syntaxhighlighter_encoded: '1'
+---
+<p>Recently I set about updating my cv and I decided to overhaul it into a web-page: one that works on any size device and that nice reformats for print... however this turned out to not be as straight forward as I first though! The final version of the cv can be found here:</p>
+<p><a title="web-cv" href="http://philingrey.com/cv/" target="_blank">http://philingrey.com/cv/</a> (html version)<br />
+<a title="Printed cv" href="http://philingrey.com/cv/cv.pdf" target="_blank">http://philingrey.com/cv/cv.pdf</a> (printed version)<br />
+<a href="http://philingrey.com/cv/"><img class="aligncenter size-large wp-image-224" title="cv" src="assets/snapshot7-1024x762.jpg" alt="" width="550" height="409" /></a></p>
+<p>And the source can be found at <a title="Source" href="https://github.com/pci/cv/" target="_blank">https://github.com/pci/cv/</a>. There were a few lessons that I learnt the hard-way and thought best to share:<br />
+<!--more--></p>
+<h1>Lessons Learnt</h1>
+<h2>Multi-Columns</h2>
+<p>Multi-columns are nice in theory - why should the number/width of columns be hard-coded, when instead the browser could work out what's best (according to your CSS criteria). However there are some issues:</p>
+<ul>
+<li>Firefox - doesn't have "break-inside" support, so is happy to split a section across two columns, even if that's not what you want</li>
+<li>Webkit (safari/chrome) - doesn't have multi-column support for print, and the last update on this was several years ago so it doesn't look like it'll come soon!</li>
+<li>Opera - any shadows that cross a column line are cut off, this might be preferable but it is the only browser to do so.</li>
+<li>IE - only IE10 has multi-column support and it's be several years before that's a mainstream browser (IE9 is only just breaking in)</li>
+</ul>
+<p>Given these issues you might think it's best to avoid multi-column, but it really is a great thing that I'd recommend people use today. Why? Because the worse case is that a browser doesn't support it and the content naturally degrades to a single column. Also browser support is growing by the day and the spec seems fairly settled (also html5please.us <a title="html5please.us" href="http://html5please.com/#multicolumn" target="_blank">agrees</a> - so it must be ok to use!).</p>
+<h2>Box-shadow</h2>
+<p>Friends don't let friends use box-shadow in print. Ever.</p>
+<p>Either it's all the browsers or it's the "print to pdf" but something likes to turn any box-shadows into nice black rectangles all over the page!</p>
+<h2>Touch and Hover</h2>
+<p>Finally, and this one makes a lot of sense, touch devices (mobiles, tablets, etc.) only send a hover state whilst a finger is pressed down on an element. So any hover tooltips will be obscured by the finger, and as soon as the finger moves the text disappears. To get over this I inserted a few lines of javascript that add a "hovering" class to any elements that have a "hoverable" class in the touch event tree.</p>
+<p>[code lang="js"]<br />
+window.onload = function(){<br />
+	/*<br />
+		Add ongoing hover for touch devices, using event capturing (sent on the way down the DOM) and event bubbling (sent on the way back up)<br />
+	*/</p>
+<p>	document.addEventListener('touchstart', function(e) {<br />
+		hb = document.getElementsByClassName('hoverable');<br />
+		for (var i = 0; i &lt; hb.length; i++) { hb[i].classList.remove(&quot;hovering&quot;); }<br />
+	}, true);</p>
+<p>	var hoverables = document.getElementsByClassName('hoverable');<br />
+	for (var i = 0; i &lt; hoverables.length; ++i) {<br />
+      hoverables[i].addEventListener('touchstart', function(e) {<br />
+		this.classList.add('hovering');<br />
+      },false);<br />
+    }<br />
+}<br />
+[/code]</p>
+<p>And thus endeth the lesson for today - Let me know what you think!</p>
