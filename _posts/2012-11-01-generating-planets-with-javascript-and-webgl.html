@@ -24,106 +24,140 @@ comments: true
 <p>The main issue is that it can take a while to generate the planet and the browser becomes unresponsive during that time. The solution? Move the code across to a web worker. As a result the main code becomes clearer but debugging becomes more of a pain: for debugging web workers I'd recommend chrome - errors in the web worker still display in the console!</p>
 <h2>Code:</h2>
 <p>The code to generate the planet geometry is in <a href="http://hacks.philingrey.com/planet_gen/world_gen.js">this script</a>. Here I'll go through the main three.js code. Firstly we have the basic three.js set up:</p>
-<p>[code lang="js"]// set the scene size<br />
-var WIDTH = 400,<br />
-  HEIGHT = 400;</p>
-<p>// set some camera attributes<br />
-var VIEW_ANGLE = 45,<br />
-  ASPECT = WIDTH / HEIGHT,<br />
-  NEAR = 0.1,<br />
-  FAR = 10000;</p>
-<p>// create a WebGL renderer, camera<br />
-// and a scene<br />
-var renderer = new THREE.WebGLRenderer();<br />
-var camera =<br />
-  new THREE.PerspectiveCamera(<br />
-    VIEW_ANGLE,<br />
-    ASPECT,<br />
-    NEAR,<br />
-    FAR);</p>
-<p>var scene = new THREE.Scene();</p>
-<p>// add the camera to the scene<br />
-scene.add(camera);</p>
-<p>// the camera starts at 0,0,0<br />
-// so pull it back<br />
-camera.position.z = 200;</p>
-<p>// create a point light<br />
-var pointLight =<br />
-  new THREE.PointLight(0xFFFFFF);</p>
-<p>// set its position<br />
-pointLight.position.x = 10;<br />
-pointLight.position.y = 50;<br />
-pointLight.position.z = 250;</p>
-<p>// add to the scene<br />
-scene.add(pointLight);</p>
-<p>// start the renderer<br />
-renderer.setSize(WIDTH, HEIGHT);</p>
-<p>// attach the render-supplied DOM element<br />
-document.body.appendChild( renderer.domElement );[/code]</p>
+
+{% highlight js %}
+var WIDTH = 400,
+  HEIGHT = 400;
+
+// set some camera attributes
+var VIEW_ANGLE = 45,
+  ASPECT = WIDTH / HEIGHT,
+  NEAR = 0.1,
+  FAR = 10000;
+
+// create a WebGL renderer, camera
+// and a scene
+var renderer = new THREE.WebGLRenderer();
+var camera =
+  new THREE.PerspectiveCamera(
+    VIEW_ANGLE,
+    ASPECT,
+    NEAR,
+    FAR);
+
+var scene = new THREE.Scene();
+
+// add the camera to the scene
+scene.add(camera);
+
+// the camera starts at 0,0,0
+// so pull it back
+camera.position.z = 200;
+
+// create a point light
+var pointLight =
+  new THREE.PointLight(0xFFFFFF);
+
+// set its position
+pointLight.position.x = 10;
+pointLight.position.y = 50;
+pointLight.position.z = 250;
+
+// add to the scene
+scene.add(pointLight);
+
+// start the renderer
+renderer.setSize(WIDTH, HEIGHT);
+
+// attach the render-supplied DOM element
+document.body.appendChild( renderer.domElement );
+{% endhighlight %}
+
 <p>Then set up the textures, the idea is to have a water sphere and a land sphere overlapping so when the land sinks past a certain radius you see the water (i.e. it defines a sea level):</p>
-<p>[code lang="js"]// set up the sphere vars<br />
-var radius = 50,<br />
-    segments = 256,<br />
-    rings = 256;</p>
-<p>// earth<br />
-var landTexture = new THREE.Texture();<br />
-var landloader = new THREE.ImageLoader();</p>
-<p>landloader.addEventListener( 'load', function ( event ) {<br />
-	landTexture.image = event.content;<br />
-	landTexture.needsUpdate = true;<br />
-} );<br />
-landloader.load( './textures/terrain/backgrounddetailed6.jpg' );</p>
-<p>// water<br />
-var waterTexture = new THREE.Texture();<br />
-var waterloader = new THREE.ImageLoader();</p>
-<p>waterloader.addEventListener( 'load', function ( event ) {<br />
-	waterTexture.image = event.content;<br />
-	waterTexture.needsUpdate = true;<br />
-} );<br />
-waterloader.load( './textures/water.jpg' );</p>
-<p>// create a new mesh with<br />
-// sphere geometry<br />
-var geometry;<br />
-var material;<br />
-var sphere;</p>
-<p>material = new THREE.MeshLambertMaterial( { map: landTexture, overdraw: true } );<br />
-material.color.setHex(0xFFFFFF);</p>
-<p>// Water<br />
-var geometryw = new THREE.SphereGeometry( radius, segments, rings );<br />
-var materialw = new THREE.MeshLambertMaterial( { map: waterTexture, overdraw: true } );<br />
-materialw.color.setHex(0x0000FF);<br />
-var spherew = new THREE.Mesh( geometryw, materialw );<br />
-[/code]</p>
+
+{% highlight js %}
+// set up the sphere vars
+var radius = 50,
+    segments = 256,
+    rings = 256;
+
+// earth
+var landTexture = new THREE.Texture();
+var landloader = new THREE.ImageLoader();
+
+landloader.addEventListener( 'load', function ( event ) {
+    landTexture.image = event.content;
+    landTexture.needsUpdate = true;
+} );
+landloader.load( './textures/terrain/backgrounddetailed6.jpg' );
+
+// water
+var waterTexture = new THREE.Texture();
+var waterloader = new THREE.ImageLoader();
+
+waterloader.addEventListener( 'load', function ( event ) {
+    waterTexture.image = event.content;
+    waterTexture.needsUpdate = true;
+} );
+waterloader.load( './textures/water.jpg' );
+
+// create a new mesh with
+// sphere geometry
+var geometry;
+var material;
+var sphere;
+
+material = new THREE.MeshLambertMaterial( { map: landTexture, overdraw: true } );
+material.color.setHex(0xFFFFFF);
+
+// Water
+var geometryw = new THREE.SphereGeometry( radius, segments, rings );
+var materialw = new THREE.MeshLambertMaterial( { map: waterTexture, overdraw: true } );
+materialw.color.setHex(0x0000FF);
+var spherew = new THREE.Mesh( geometryw, materialw );
+{% endhighlight %}
+
 <p>Now all that's left is the land geometry, here's where the web worker comes in:</p>
-<p>[code lang="js"]<br />
-// load up the web worker<br />
-var worker = new Worker('./world_gen.js');</p>
-<p>// define what happens when we get a message</p>
-<p>worker.addEventListener('message', function(e) {<br />
-	if(e.data.msg == &quot;progress&quot;){<br />
-		// update the progress bar<br />
-		document.getElementById('debug').innerHTML = (e.data.perc+'').slice(0,4)+&quot;% complete&quot;;<br />
-	} else if(e.data.msg == &quot;finished&quot;){<br />
-		// If this isn't the first render remove the last one<br />
-		if(sphere) {scene.remove(sphere);}</p>
-<p>		// calculation is finished - update the geometry<br />
-		document.getElementById(&quot;debug&quot;).innerHTML = &quot;&quot;;<br />
-		for(var i=0;i&lt;e.data.verts.length;i++){<br />
-			geometry.vertices[i].x = e.data.verts[i].x;<br />
-			geometry.vertices[i].y = e.data.verts[i].y;<br />
-			geometry.vertices[i].z = e.data.verts[i].z;<br />
-		}</p>
-<p>		sphere = new THREE.Mesh( geometry, material );</p>
-<p>		scene.add(sphere);<br />
-	} else {<br />
-		console.log(e);<br />
-	}</p>
-<p>},false);</p>
-<p>// finally, when the start button is clicked fire a message to the web worker to get started<br />
-document.getElementById(&quot;startb&quot;).addEventListener(&quot;click&quot;,function(e){<br />
-	scene.add(spherew);</p>
-<p>	geometry = new THREE.SphereGeometry( radius, segments, rings );</p>
-<p>	worker.postMessage({&quot;cmd&quot;: &quot;run&quot;, &quot;offcenter&quot;:document.getElementById(&quot;offcentercb&quot;).checked ,&quot;verts&quot;: geometry.vertices, &quot;radius&quot;: radius, &quot;N&quot;: document.getElementById('itttext').value});<br />
-});<br />
-[/code]</p>
+
+{% highlight js %}
+// load up the web worker
+var worker = new Worker('./world_gen.js');
+
+// define what happens when we get a message
+
+worker.addEventListener('message', function(e) {
+    if(e.data.msg == "progress"){
+        // update the progress bar
+        document.getElementById('debug').innerHTML = (e.data.perc+'').slice(0,4)+"% complete";
+    } else if(e.data.msg == "finished"){
+        // If this isn't the first render remove the last one
+        if(sphere) {scene.remove(sphere);}
+
+        // calculation is finished - update the geometry
+        document.getElementById("debug").innerHTML = "";
+        for(var i=0;i<e.data.verts.length;i++){
+            geometry.vertices[i].x = e.data.verts[i].x;
+            geometry.vertices[i].y = e.data.verts[i].y;
+            geometry.vertices[i].z = e.data.verts[i].z;
+        }
+
+        sphere = new THREE.Mesh( geometry, material );
+
+        scene.add(sphere);
+    } else {
+        console.log(e);
+    }
+
+},false);
+
+// finally, when the start button is clicked fire a message to the web worker to get started
+document.getElementById("startb").addEventListener("click",function(e){
+    scene.add(spherew);
+
+    geometry = new THREE.SphereGeometry( radius, segments, rings );
+
+    worker.postMessage({"cmd": "run", "offcenter":document.getElementById("offcentercb").checked ,"verts": geometry.vertices, "radius": radius, "N": document.getElementById('itttext').value});
+});
+{% endhighlight %}
+
 <p>Then all that's left is to add a slow rotation and <a href="http://hacks.philingrey.com/planet_gen/">it's done</a>.</p>

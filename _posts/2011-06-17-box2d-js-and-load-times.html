@@ -22,8 +22,21 @@ comments: true
 <p>So the browser has to make 64 different server calls and pull down 349 Kb just to start doing anything. This can clearly be improved on.</p>
 <p>Turning on <a title="Pushing beyond gzipping" href="http://developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/" target="_blank">server-side gzip</a>, is a good way to reduce the amount of data transmitted with no real downsides. Also putting everything in one file will help a lot, but more can still be done.</p>
 <p>To shrink the javascript filesize even more there are two paths: compressors or encoders. Compressors (like yahoo's <a title="YUI Compressor" href="http://developer.yahoo.com/yui/compressor/" target="_blank">YUI compressor</a>) remove whitespace, rename internal variables to have shorter name and do a hundred and one different optimizations, but crucially, the end javascript is programmatically identical to the input file (a browser doesn't care if a variable is called "theGreenBallsRadius" or "aPb"). Encoders (like Dean Edwards' <a title="Packer" href="http://dean.edwards.name/packer/" target="_blank">Packer</a>) go one stage further - they encode the resulting file (much like gzipping) and then tag on some javascript so the browser can decode it at the other end, but this creates some javascript overhead before things can get up and running.</p>
-<p>Now because everything is better in table form:<br />
-<strong>[table id=1 /]</strong></p>
+<p>Now because everything is better in table form:</p>
+<table>
+<thead>
+    <tr class="row-1 odd"><th style="width: 143px;" colspan="1" rowspan="1" class="column-1 sorting">Name</th><th style="width: 75px;" colspan="1" rowspan="1" class="column-2 sorting">Files</th><th style="width: 120px;" colspan="1" rowspan="1" class="column-3 sorting">Size (Kb)</th><th style="width: 166px;" colspan="1" rowspan="1" class="column-4 sorting">w/ GZip (Kb)</th></tr>
+</thead>
+
+<tbody><tr class="row-2 even">
+        <td class="column-1">Original</td><td class="column-2">64</td><td class="column-3">349</td><td class="column-4">100</td>
+    </tr><tr class="row-3 odd">
+        <td class="column-1">Concatenated</td><td class="column-2">1</td><td class="column-3">349</td><td class="column-4">54</td>
+    </tr><tr class="row-4 even">
+        <td class="column-1">YUI</td><td class="column-2">1</td><td class="column-3">139</td><td class="column-4">28.2</td>
+    </tr><tr class="row-5 odd">
+        <td class="column-1">Packer</td><td class="column-2">1</td><td class="column-3">80.7</td><td class="column-4">28.3</td>
+    </tr></tbody></table>
 <p><strong></strong>This shows near 85% improvement just by putting everything in one file and turning on gzip! But even better, the filesize can be halved on top of this.</p>
 <p>My first instinct was to go with the Packer encoded version: it's the smallest (or close enough) whether the user's browser supports gzip or not. But the YUI compressed version is my recommendation. Why? Well I'm glad you asked! The vast majority of visitors' browsers will accept gzipped files, so for them there's no filesize difference between YUI and Packer. Now with YUI you can just un-gzip and you're away, however with Packer you unzip <em>then</em> decode <em>then</em> you're good to go. This additional step will still halt rendering until it's complete, making the page load feel slower - the exact thing we were trying to improve.</p>
 <p>There you go, a good library made better! Now onto hacking it.....</p>
