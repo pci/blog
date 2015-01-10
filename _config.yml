@@ -1,7 +1,7 @@
 # Site wide configuration
 
-title:            Site Title
-locale:           en_US
+title:            Hacks @ philingrey.com
+locale:           en_GB
 url:              
 
 
@@ -30,7 +30,7 @@ owner:
   avatar: phil_profile.jpg
   bio: '"The dumbest smart person I know"'
   email: 
-  disqus-shortname: 
+  disqus-shortname: philingrey
   twitter: philingrey
   facebook: #username
   google:

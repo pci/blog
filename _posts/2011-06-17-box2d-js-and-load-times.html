@@ -14,9 +14,10 @@ type: post
 published: true
 meta:
   _edit_last: '1'
+comments: true
 ---
 <p>I recently discovered <a title="box2d-js" href="http://http://box2d-js.sourceforge.net/" target="_blank">box2djs</a> by Ando Yasushi, a nice little physics simulation engine made to run in javascript, here's an example from the homepage:</p>
-<p><a title="box2d-js Homepage" href="http://box2d-js.sourceforge.net/index2.html" target="_blank"><img class="aligncenter size-full wp-image-85" title="box2djs" src="assets/snapshot7.png" alt="box2d-js homepage" width="498" height="303" /></a></p>
+<p><a title="box2d-js Homepage" href="http://box2d-js.sourceforge.net/index2.html" target="_blank"><img class="aligncenter size-full wp-image-85" title="box2djs" src="/images/old_blog/snapshot7.png" alt="box2d-js homepage" width="498" height="303" /></a></p>
 <p>However, it being a port of a port, there are one or two little problems. The main one by far is the delivery of the library - in the flash version, modules are loaded lazily (i.e. as needed), however in javascript all the different libraries need loading up-front.... all 64 of them... in a set order... and each file has the full MIT license information at the top!</p>
 <p>So the browser has to make 64 different server calls and pull down 349 Kb just to start doing anything. This can clearly be improved on.</p>
 <p>Turning on <a title="Pushing beyond gzipping" href="http://developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/" target="_blank">server-side gzip</a>, is a good way to reduce the amount of data transmitted with no real downsides. Also putting everything in one file will help a lot, but more can still be done.</p>

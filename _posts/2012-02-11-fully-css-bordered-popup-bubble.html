@@ -10,11 +10,12 @@ published: true
 meta:
   _edit_last: '1'
   _syntaxhighlighter_encoded: '1'
+comments: true
 ---
 <p>This is my addition to the world of totally css popup bubbles: borders on tooltips - life changing, I know.</p>
 <p style="text-align: left;">The challenge is this: create a pop-up bubble for an element with no non-semantic elements, with the end result looking something like this:</p>
 <p style="text-align: center;">
-<a href="http://hacks.philingrey.com/css_popup/full.html" target="_blank"><img class="aligncenter size-full wp-image-152" title="full" src="assets/full.png" alt="" width="244" height="100" />Demo</a></p>
+<a href="http://hacks.philingrey.com/css_popup/full.html" target="_blank"><img class="aligncenter size-full wp-image-152" title="full" src="/images/old_blog/full.png" alt="" width="244" height="100" />Demo</a></p>
 <p>Html-wise I've opted for the following (I'll argue why later....):<br />
 [code lang="html"]&lt;article class=&quot;popup&quot;&gt;<br />
     Main Text<br />
@@ -37,7 +38,7 @@ meta:
 }<br />
 [/code]</p>
 <p>(with some border-radius for good measure):</p>
-<p style="text-align: center;"><a href="http://hacks.philingrey.com/css_popup/1.html" target="_blank"><img class="aligncenter size-full wp-image-153" title="1" src="assets/1.png" alt="" width="252" height="110" />Demo</a></p>
+<p style="text-align: center;"><a href="http://hacks.philingrey.com/css_popup/1.html" target="_blank"><img class="aligncenter size-full wp-image-153" title="1" src="/images/old_blog/1.png" alt="" width="252" height="110" />Demo</a></p>
 <p>The main text's CSS is taken from the great <a href="http://twitter.github.com/bootstrap/" title="Twitter Bootstrap" target="_blank">twitter bootstrap</a>, and isn't necessary for the demo but is nice eye candy!</p>
 <p>
 Now comes the challenging bit: how to do the tag at the bottom? My first thought was to use a "V" in the content of a psudo-class, positioned correctly, but that just looked weird! So I turned to a nicety of the CCS border spec: the ability to make <a title="CSS tricks - CSS Triangles" href="http://css-tricks.com/snippets/css/css-triangle/" target="_blank">triangles with CSS</a>.</p>
@@ -60,7 +61,7 @@ Now comes the challenging bit: how to do the tag at the bottom? My first thought
 (The content:"." is because firefox only renders pseudo elements if they have a non-whitespace content, the color:transparent then makes it invisible)</p>
 <p>However this isn't quite right:</p>
 <p style="text-align: center;">
-<a href="http://hacks.philingrey.com/css_popup/2.html" target="_blank"><img src="assets/2_white.png" alt="" title="2_white" width="258" height="114" class="aligncenter size-full wp-image-154" />Demo</a></p>
+<a href="http://hacks.philingrey.com/css_popup/2.html" target="_blank"><img src="/images/old_blog/2_white.png" alt="" title="2_white" width="258" height="114" class="aligncenter size-full wp-image-154" />Demo</a></p>
 <p>And this is where most tooltip/popup bubble solutions stop: they put the tooltip text in a data-attribute then use one pseudo element to display it and the other to make the tip, however because the tip was made with the border properties of the pseudo element you can't add an additional border onto the tip. However by using the &lt;aside&gt; element this gives use three elements to work with (aside, aside:before, aside:after)* still without adding any non-semantic elements. The question is then, can we use this third element to add a border to the tooltip? Why yes!</p>
 <p>By knowing the <a href="http://nicolasgallagher.com/multiple-backgrounds-and-borders-with-css2/">rendering order</a> of pseudo element, you can use the :before element to make a black tooltip then the :after element to make a (slightly smaller and moved slightly right) white tooltip that then gets rendered on top:<br />
 [code lang="css"]<br />
@@ -84,7 +85,7 @@ Now comes the challenging bit: how to do the tag at the bottom? My first thought
 }<br />
 [/code]</p>
 <p>Finally, adding some hover transition bling gives the final result:</p>
-<p style="text-align: center;"><a href="http://hacks.philingrey.com/css_popup/full.html" target="_blank"><img src="assets/full.png" alt="" title="full" width="244" height="100" class="aligncenter size-full wp-image-152" />Demo</a></p>
+<p style="text-align: center;"><a href="http://hacks.philingrey.com/css_popup/full.html" target="_blank"><img src="/images/old_blog/full.png" alt="" title="full" width="244" height="100" class="aligncenter size-full wp-image-152" />Demo</a></p>
 <p>Browser-wise: this works in current Firefox, Chrome, Opera, Safari and Android. Being a linux guy I don't know if it works in IE but my assumption would be it'll work in IE9+ and could be polyfillied for IE8 and below (see <a href="http://css3pie.com/">cc3pie</a> and <a href="http://selectivizr.com/">selectivizr</a>), but tell me in the comments if I'm wrong!</p>
 <p>As final point: tooltips are great if the user is on a desktop, but on a mobile they often go off the edge of screen and can suck. So consider putting in a media-query into your css and restyling your tooltips for small screens.</p>
 <p>* techinically there are 5 elements including .popup:before and .popup:after but that feels a bit cheeky to use these, as the tooltip is all about the &lt;aside&gt; element, and it's good to leave these pseudo elements for additional styling of the main &lt;article&gt;.</p>

@@ -10,13 +10,14 @@ published: true
 meta:
   _edit_last: '1'
   _syntaxhighlighter_encoded: '1'
+comments: true
 ---
 <p>I recently stated using three.js to play around with webgl and here are the first fruits - procedurally generating planets with javascript. The demo is avalible <a href="http://hacks.philingrey.com/planet_gen/">here</a>.<br />
-<a href="http://hacks.philingrey.com/planet_gen/"><img src="assets/Screen-Shot-2012-10-30-at-10.24.38.png" alt="" title="Procedurally generated planet" width="495" height="605" class="aligncenter size-full wp-image-251" /></a><br />
+<a href="http://hacks.philingrey.com/planet_gen/"><img src="/images/old_blog/Screen-Shot-2012-10-30-at-10.24.38.png" alt="" title="Procedurally generated planet" width="495" height="605" class="aligncenter size-full wp-image-251" /></a><br />
 <!--more--></p>
 <h2>Method:</h2>
 <p>I ended up using an oldie-but-goodie method based on <a href="http://freespace.virgin.net/hugo.elias/models/m_landsp.htm">hemisphere perturbation</a>: you choose a random hemisphere and slightly nudge it outwards and nudge the other hemisphere inwards. Do this a lot of times and you have a reasonable looking planet.</p>
-<p>[caption id="attachment_247" align="aligncenter" width="550"]<a href="http://hacks.philingrey.com/wp-content/uploads/2012/11/itt.jpg"><img class="size-large wp-image-247" title="iterations of hemisphere perturbation" src="assets/itt-1024x183.jpg" alt="1, 5, 50 and 500 iterations of perturbation" width="550" height="98" /></a> 1, 5, 50 and 500 iterations of hemisphere perturbations showing the development of coastlines[/caption]</p>
+<p>[caption id="attachment_247" align="aligncenter" width="550"]<a href="http://hacks.philingrey.com/wp-content/uploads/2012/11/itt.jpg"><img class="size-large wp-image-247" title="iterations of hemisphere perturbation" src="/images/old_blog/itt-1024x183.jpg" alt="1, 5, 50 and 500 iterations of perturbation" width="550" height="98" /></a> 1, 5, 50 and 500 iterations of hemisphere perturbations showing the development of coastlines[/caption]</p>
 <p>This method has one drawback - one side is the relief of the other, i.e. if one point is above the water level then the opposite point will be underwater. This can be <a href="http://freespace.virgin.net/hugo.elias/models/m_landsp.htm">fixed</a> but takes more iterations to look authentic.</p>
 <p>All in all, whilst this is certainly not the fastest method, its quick to setup and and easy to understand.</p>
 <h2>Lessons learnt:</h2>
