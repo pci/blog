@@ -2,7 +2,8 @@
 
 title:            Hacks @ philingrey.com
 locale:           en_GB
-url:              
+url:              /blog
+baseurl:          /blog
 
 
 # Jekyll configuration

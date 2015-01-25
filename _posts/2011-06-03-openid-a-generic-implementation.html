@@ -1,4 +1,4 @@
----
+Ï---
 layout: post
 title: OpenID - a generic implementation
 date: 2011-06-03 09:16:59.000000000 +01:00
@@ -20,7 +20,7 @@ comments: true
 <p>So from a user point of view it's nice and simple, and with companies like google, yahoo, AOL and others supporting it, many people already have an OpenID without even knowing it. And from a web developer point of view you don't have to worry about making a secure up-to-date login system as the OpenID providers do that for you.</p>
 <p>The challenge for a website then is to make it easy for people who've never encountered OpenID to login. There are some nice graphical systems out there (the most popular being <a href="http://code.google.com/p/openid-selector/" target="_blank">openid-selector</a>), however I prefer <a title="Jarrett Vance's OpenID login" href="http://jvance.com/pages/jQueryOpenIdPlugin.xhtml" target="_blank">this system</a> from Jarrett Vance, it's more lightweight, far more hackable (in the good way),  has a natural and clever non-javascript fall-back and it's easy to plug into any OpenID verification system you like.</p>
 <p>Combining this with the <a href="http://code.google.com/p/lightopenid/" target="_blank">LightOpenID</a> PHP verification system and a bit of PHP sessions, gives the following generic login system:</p>
-<p style="text-align: center;"><a href="http://hacks.philingrey.com/OpenID/"><img class="aligncenter size-full wp-image-72" title="OpenID login" src="/images/old_blog/snapshot61.png" alt="OpenID login" width="470" height="287" /></a></p>
+<p style="text-align: center;"><a href="http://hacks.philingrey.com/OpenID/"><img class="aligncenter size-full wp-image-72" title="OpenID login" src="{{ site.url }}/images/old_blog/snapshot61.png" alt="OpenID login" width="470" height="287" /></a></p>
 <p style="text-align: center;">&nbsp;</p>
 <p>Which you can have a go with <a title="OpenID login system" href="http://hacks.philingrey.com/OpenID/" target="_blank">here</a>.</p>
 <p>And here are all the files (<a title="tar.gz of files" href="http://hacks.philingrey.com/OpenID/OpenID.tar.gz" target="_blank">tar.gz</a> / <a title="Zip of files" href="http://hacks.philingrey.com/OpenID/OpenID.zip" target="_blank">zip</a>)</p>
