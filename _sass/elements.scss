@@ -10,6 +10,11 @@ hr {
 /* Figures and images ==================================== */
 figure {
 	margin-bottom: $indent-var;
+  margin: 0 auto;
+  text-align: center;
+}
+.meme {
+  max-width: 70%;
 }
 article img {
 	max-width: 100%;
