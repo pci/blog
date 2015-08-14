@@ -8,10 +8,6 @@ tags:
 - Meta
 type: post
 comments: true
-image:
-  feature: leaders/blog-fridge.jpg
-  credit: Christian Schnettelker
-  creditlink: http://www.manoftaste.de/
 ---
 
 So there has been little to no activity on this blog for a couple of years, perhaps unsurprisingly this is very strongly correlated to my eldest son's birthday. However I have finally had some time to give the site some TLC and what you see now is the end result. This aim of this post is to explain the tech behind the new look and the (hopeful) future of this blog.
