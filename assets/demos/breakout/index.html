@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Breakout!</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+      }
+
+      button {
+        display: block;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        background: #333;
+        color: white;
+      }
+
+      canvas {
+        background: white;
+      }
+
+      @media (prefers-color-scheme: light) {
+        body {
+          background: white;
+          color: black;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <label for='cheat'><input type='checkbox' id='cheat'/> Let a super-advanced-AI™️ play for you</label>
+    <label for='hardmode'><input type='checkbox' id='hardmode'/> Hard-mode</label>
+    <button id="start" disabled="true">Insert Coin</button>
+    <canvas width="450" height="260" id="canvas"></canvas>
+    <p>Score: <span id="score">0</span></p>
+    <script src="index.js"></script>
+  </body>
+</html>
