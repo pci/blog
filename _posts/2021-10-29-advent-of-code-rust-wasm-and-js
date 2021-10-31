@@ -13,6 +13,11 @@ type: post
 comments: false
 ---
 
+<figure>
+	<img src="{{ site.url }}/images/2021-10-breakout.png">
+	<figcaption>42 years later, making breakout in the most convoluted way.</figcaption>
+</figure>
+
 Ok, let's get the first thing out the way so we can get onto the fun parts - yes, I haven't posted in 5 years. Life gets busy. And if you don't stop moaning about it, it'll likely be another 5 years before I do again (...fair warning, even if you do stop, it might still be that long... sorry.). Anyway, let's skim over that.
 
 So anyway I made a thing. You can play it [here]({ site.url }}/assets/demos/breakout/index.html), and the code is [here](https://github.com/pci/advent-of-code/tree/master/2019-rust/day13-wasm).
@@ -58,13 +63,13 @@ And the result is a very playable game. Or rather it's actually quite challengin
 
 But this is where things get interesting. I noticed the game initialized markedly faster on some browsers. Turns out WASM speed varies widely across browsers. So I let rust's [wasm-pack](https://rustwasm.github.io/docs/wasm-pack/introduction.html) build an optimized version (of the unoptimized rust code) and took some measurements:
 
-## | Browser | Run Time |
-
-| Chrome | 18.9s |
-| Firefox | 4.6s |
-| Safari | 3.6s |
-| Chrome (android) | 319.5s |
-| Firefox (android) | 14.6s |
+| Browser           | Run Time |
+| ----------------- | -------- |
+| Chrome            | 18.9s    |
+| Firefox           | 4.6s     |
+| Safari            | 3.6s     |
+| Chrome (android)  | 319.5s   |
+| Firefox (android) | 14.6s    |
 
 Table 1: Running the base code with no UI component with no input until the game ends, and it does that 10 times in a row for total time.
 
@@ -76,7 +81,10 @@ I deliberately haven't posted any code up to this point, as the code was hacked 
 
 Whilst I normally just plough into fixing what I think will be slow in the code (a case of do as I say, not as I do), let's have a look at what timings we can easily get access to. Luckily for us, if we build with name symbols (as easy as `npm start` over `npm run build` in the rust-webpack-template), then the browsers own profile can tell us a lot:
 
-TODO: insert profiler picture
+<figure>
+	<img src="{{ site.url }}/images/2021-10-profiling-wasm.png">
+	<figcaption>Profiling WebAssembly in Chrome</figcaption>
+</figure>
 
 Here we see we're spending most of our time in memcpy in Chrome, and a bit in major garbage collection, probably due to all the memory needing to be freed. So why are we copying so much? Looking at the code gives us a good idea.
 
@@ -99,13 +107,13 @@ This is a _really_ powerful pattern, for example in a sudoku solver, a few basic
 
 So what would happen if we said - stuff that, let's mutate the state we're given rather than copying the state everywhere? Well that's coded up as `MutState` in the [src/lib.rs](https://github.com/pci/advent-of-code/blob/master/2019-rust/day13-wasm/src/lib.rs) in the source. and it's fair to say it's a little faster:
 
-## | Browser | Run Time |
-
-| Chrome | 76ms |
-| Firefox | 63ms |
-| Safari | 70ms |
-| Chrome (android) | 359ms |
-| Firefox (android) | 159ms |
+| Browser           | Run Time |
+| ----------------- | -------- |
+| Chrome            | 76ms     |
+| Firefox           | 63ms     |
+| Safari            | 70ms     |
+| Chrome (android)  | 359ms    |
+| Firefox (android) | 159ms    |
 
 Super performant, over 50x faster, and not even on chrome on android it's now over an order of magnitude faster than desktop safari with unoptimised code.
 

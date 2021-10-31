@@ -1,16 +1,15 @@
 # Site wide configuration
 
-title:            pci blog
-locale:           en_GB
-url:              /blog
-baseurl:          /blog
-
+title: pci blog
+locale: en_GB
+url: /blog
+baseurl: /blog
 
 # Jekyll configuration
 
-permalink:   /:year/:month/:title/
-markdown:    kramdown
-highlighter: pygments
+permalink: /:year/:month/:title/
+markdown: kramdown
+highlighter: rouge
 sass:
   sass_dir: _sass
   style: compressed
@@ -24,12 +23,11 @@ kramdown:
   toc_levels: 1..6
   use_coderay: false
 
-
 # Site owner
 owner:
   name: Phil Ingrey
   avatar: phil_profile.jpg
-  bio: "Shameless self-promotion: I'm currently looking to move to Birmingham, UK. If you work at an interesting tech company nearby (and are hiring!), then I'd love to hear from you."
+  bio: "'The dumbest smart person I know' - a friend"
   email: phil@ingrey.dev
   disqus-shortname: philingrey
   twitter: philingrey
@@ -37,10 +35,10 @@ owner:
   google:
     plus: #username
     analytics: UA-21744556-2
-    verify: 
-    ad-client: 
-    ad-slot: 
-  bing-verify: 
+    verify:
+    ad-client:
+    ad-slot:
+  bing-verify:
   github: pci
   stackoverflow: #http://stackoverflow.com/users/123456/username
   linkedin: #username
@@ -57,4 +55,26 @@ owner:
   cv: https://ingrey.dev/cv/
 
 include: [".htaccess"]
-exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md"]
+exclude:
+  [
+    "lib",
+    "config.rb",
+    "Capfile",
+    "config",
+    "log",
+    "Rakefile",
+    "Rakefile.rb",
+    "tmp",
+    "less",
+    "*.sublime-project",
+    "*.sublime-workspace",
+    "test",
+    "spec",
+    "Gruntfile.js",
+    "package.json",
+    "node_modules",
+    "Gemfile",
+    "Gemfile.lock",
+    "LICENSE",
+    "README.md",
+  ]
