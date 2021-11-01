@@ -14,14 +14,14 @@ comments: false
 ---
 
 <figure>
-  <a target="_blank" href="{{ site.url }}/assets/demos/breakout/index.html">
+  <a target="_blank" href="{{ site.url }}/assets/demos/breakout/">
     <img src="{{ site.url }}/images/2021-10-breakout.png">
     <figcaption>45 years later, making breakout in the most convoluted way.</figcaption>
   </a>
 </figure>
 <br/>
 
-So I made a thing. You can play it <a href="{{ site.url }}/assets/demos/breakout/index.html)" target="_blank" rel="noopener noreferrer">here</a>, and the code is [here](https://github.com/pci/advent-of-code/tree/master/2019-rust/day13-wasm).
+So I made a thing. You can play it <a href="{{ site.url }}/assets/demos/breakout/" target="_blank" rel="noopener noreferrer">here</a>, and the code is [here](https://github.com/pci/advent-of-code/tree/master/2019-rust/day13-wasm).
 
 You might be thinking "ok, so it's a blog post on writing a retro game of breakout", but nope - I didn't even write the game code. And that's kind of the point of this post. Come see how [many turtles](https://quoteinvestigator.com/2021/08/22/turtles-down/) are on each others' backs.
 
